@@ -1,5 +1,12 @@
 import { createCartLine, showCartContent } from './lib/ui.js';
 
+/**
+ * @typedef {Object} Product
+ * @property {number} id 
+ * @property {string} title
+ * @property {string} description
+ * @property {number} price
+ */
 const products = [
   {
     id: 1,
@@ -22,19 +29,24 @@ const products = [
   },
 ];
 
-/** Bæta vöru í körfu */
+/** 
+ * Bæta vöru í körfu
+ * @param  {Product} product
+ * @param {number} quantity
+ */
+
 function addProductToCart(product, quantity) {
   // Hér þarf að finna `<tbody>` í töflu og setja `cartLine` inn í það
-  const cart = document.querySelector('.cart-content');
-
-  if (!cart) {
-    console.warn('fann ekki .cart');
+  const cartTableBodyElement= document.querySelector('.cart table tbody');
+  
+  if (!cartTableBodyElement) {
+    console.warn('fann ekki .cart table');
     return;
   }
   
   // TODO hér þarf að athuga hvort lína fyrir vöruna sé þegar til
   const cartLine = createCartLine(product, quantity);
-  cart.appendChild(cartLine);
+  cartTableBodyElement.appendChild(cartLine);
 
   // Sýna efni körfu
   showCartContent(true);
@@ -47,13 +59,17 @@ function submitHandler(event) {
   event.preventDefault();
   
   // Finnum næsta element sem er `<tr>`
-  const parent = event.target.closest('tr')
+  const parent = event.target.closest('tr');
 
   // Það er með attribute sem tiltekur auðkenni vöru, t.d. `data-product-id="1"`
   const productId = Number.parseInt(parent.dataset.productId);
 
   // Finnum vöru með þessu productId
   const product = products.find((i) => i.id === productId);
+
+  if (!product) {
+    return;
+  }
 
   // TODO hér þarf að finna fjölda sem á að bæta við körfu með því að athuga
   // á input
@@ -62,6 +78,9 @@ function submitHandler(event) {
   // Bætum vöru í körfu (hér væri gott að bæta við athugun á því að varan sé til)
   addProductToCart(product, quantity);
 }
+
+
+
 
 // Finna öll form með class="add"
 const addToCartForms = document.querySelectorAll('.add')
